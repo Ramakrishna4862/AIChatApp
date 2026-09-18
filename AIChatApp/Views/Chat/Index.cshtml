@@ -1,0 +1,76 @@
+﻿@* <div class="container mt-4">
+
+    <h2>AI Chat</h2>
+
+    <form method="post" action="/Chat/SendMessage">
+
+        <div class="mb-3">
+            <label class="form-label">Ask something</label>
+
+            <textarea name="message"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Type your question..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Send
+        </button>
+
+    </form>
+
+</div> *@
+
+
+
+@model AIChatApp.Models.ChatViewModel
+
+<div class="container mt-4">
+
+    <h2>AI Chat</h2>
+
+    <form method="post" action="/Chat/SendMessage">
+
+        <div class="mb-3">
+            <label class="form-label">Ask something</label>
+
+            <textarea name="message"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Type your question..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Send
+        </button>
+
+    </form>
+
+    @if (Model != null && !string.IsNullOrEmpty(Model.UserMessage))
+    {
+        <div class="mt-4">
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    You
+                </div>
+
+                <div class="card-body">
+                    @Model.UserMessage
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    AI
+                </div>
+
+                <div class="card-body">
+                    @Model.AIResponse
+                </div>
+            </div>
+
+        </div>
+    }
+
+</div>
