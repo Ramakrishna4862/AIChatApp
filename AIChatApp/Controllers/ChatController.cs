@@ -18,9 +18,9 @@ namespace AIChatApp.Controllers
         //}
 
         private readonly IAIService _aiServices;
-        public ChatController(IAIService aIService)
+        public ChatController(IAIService aiService)
         {
-            _aiServices = aIService;
+            _aiServices = aiService;
         }
         public IActionResult Index()
         {
