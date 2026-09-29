@@ -10,9 +10,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//builder.Services.AddScoped<IAIService, FakeAIService>();
+builder.Services.AddScoped<IAIService, FakeAIService>();
 //builder.Services.AddScoped<IAIService, OpenAIService>();
-builder.Services.AddHttpClient<IAIService, GeminiAIService>();
+//builder.Services.AddHttpClient<IAIService, GeminiAIService>();
 
 var app = builder.Build();
 

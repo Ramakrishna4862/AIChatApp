@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 namespace AIChatApp.Services
@@ -7,19 +6,16 @@ namespace AIChatApp.Services
     public class GeminiAIService : IAIService
     {
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
 
-        public GeminiAIService(
-            HttpClient httpClient,
-            IConfiguration configuration)
+        public GeminiAIService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
         }
 
         public async Task<string> GetResponseAsync(string message)
         {
-            string? apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+            string? apiKey =
+                Environment.GetEnvironmentVariable("GEMINI_API_KEY");
 
             if (string.IsNullOrEmpty(apiKey))
             {
@@ -37,46 +33,70 @@ namespace AIChatApp.Services
 
             string json = JsonSerializer.Serialize(requestBody);
 
-            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+            using var request =
+                new HttpRequestMessage(HttpMethod.Post, url);
 
             request.Headers.Add("x-goog-api-key", apiKey);
+
             request.Content = new StringContent(
                 json,
                 Encoding.UTF8,
                 "application/json");
 
-            using HttpResponseMessage response =
-                await _httpClient.SendAsync(request);
-
-            string responseContent =
-                await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return "Gemini API Error: " + responseContent;
-            }
+                using HttpResponseMessage response =
+                    await _httpClient.SendAsync(request);
 
-            using JsonDocument document =
-                JsonDocument.Parse(responseContent);
+                string responseContent =
+                    await response.Content.ReadAsStringAsync();
 
-            JsonElement root = document.RootElement;
-
-            foreach (JsonElement step in root.GetProperty("steps").EnumerateArray())
-            {
-                if (step.GetProperty("type").GetString() == "model_output")
+                if (!response.IsSuccessStatusCode)
                 {
-                    foreach (JsonElement content in step.GetProperty("content").EnumerateArray())
+                    if ((int)response.StatusCode == 429)
                     {
-                        if (content.GetProperty("type").GetString() == "text")
+                        return "Gemini request limit reached. Please try again later.";
+                    }
+
+                    return "Gemini API Error: " + responseContent;
+                }
+
+                using JsonDocument document =
+                    JsonDocument.Parse(responseContent);
+
+                JsonElement root = document.RootElement;
+
+                foreach (JsonElement step in
+                    root.GetProperty("steps").EnumerateArray())
+                {
+                    if (step.GetProperty("type").GetString() == "model_output")
+                    {
+                        foreach (JsonElement content in
+                            step.GetProperty("content").EnumerateArray())
                         {
-                            return content.GetProperty("text").GetString()
-                                   ?? "No response received.";
+                            if (content.GetProperty("type").GetString() == "text")
+                            {
+                                return content.GetProperty("text").GetString()
+                                       ?? "No response received.";
+                            }
                         }
                     }
                 }
-            }
 
-            return "No response received from Gemini.";
+                return "No response received from Gemini.";
+            }
+            catch (TaskCanceledException)
+            {
+                return "Gemini API request timed out. Please try again later.";
+            }
+            catch (HttpRequestException)
+            {
+                return "Unable to connect to Gemini API. Please check your internet connection and try again.";
+            }
+            catch (Exception)
+            {
+                return "An unexpected error occurred while contacting Gemini.";
+            }
         }
     }
 }

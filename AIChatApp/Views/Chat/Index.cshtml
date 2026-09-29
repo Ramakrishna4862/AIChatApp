@@ -1,43 +1,21 @@
-﻿@* <div class="container mt-4">
-
-    <h2>AI Chat</h2>
-
-    <form method="post" action="/Chat/SendMessage">
-
-        <div class="mb-3">
-            <label class="form-label">Ask something</label>
-
-            <textarea name="message"
-                      class="form-control"
-                      rows="4"
-                      placeholder="Type your question..."></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Send
-        </button>
-
-    </form>
-
-</div> *@
-
-
-
-@model AIChatApp.Models.ChatViewModel
+﻿@model AIChatApp.Models.ChatViewModel
 
 <div class="container mt-4">
 
     <h2>AI Chat</h2>
 
-    <form method="post" action="/Chat/SendMessage">
+    <form method="post" action="/Chat/Insert">
 
         <div class="mb-3">
             <label class="form-label">Ask something</label>
 
-            <textarea name="message"
+            <textarea name="UserMessage"
                       class="form-control"
                       rows="4"
                       placeholder="Type your question..."></textarea>
+
+            <span asp-validation-for="UserMessage"
+                  class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary">
