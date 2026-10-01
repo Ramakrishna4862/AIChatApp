@@ -11,5 +11,6 @@ namespace AIChatApp.Data
         }
 
         public DbSet<ChatMessage> ChatMessages { get; set; }    
+        public DbSet<ChatSession> ChatSessions { get; set; }
     }
 }

@@ -19,67 +19,46 @@ namespace AIChatApp.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int? sessionId)
         {
-            return View();
-        }
+            var sessions = await _context.ChatSessions
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync();
 
-        [HttpPost]
-        public async Task<IActionResult> SendMessage(string message)
-        {
-            string response =
-                await _aiServices.GetResponseAsync(message);
-
-            ChatViewModel model = new ChatViewModel
+            if (sessionId == null)
             {
-                UserMessage = message,
-                AIResponse = response
-            };
-
-            return View("Index", model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Insert(Models.ChatMessage chatMessage)
-        {
-            if (string.IsNullOrWhiteSpace(chatMessage.UserMessage))
-            {
-                ChatViewModel emptyModel = new ChatViewModel();
-
-                return View("Index", emptyModel);
-            }
-
-            string aiResponse =
-                await _aiServices.GetResponseAsync(chatMessage.UserMessage);
-
-            if (aiResponse.StartsWith("Gemini API Error:") ||
-                aiResponse == "Gemini API key is not configured." ||
-                aiResponse == "No response received from Gemini.")
-            {
-                ChatViewModel errorModel = new ChatViewModel
+                var session = new ChatSession
                 {
-                    UserMessage = chatMessage.UserMessage,
-                    AIResponse = aiResponse
+                    Title = "New Chat",
+                    CreatedDate = DateTime.Now
                 };
 
-                return View("Index", errorModel);
+                _context.ChatSessions.Add(session);
+                await _context.SaveChangesAsync();
+
+                sessionId = session.Id;
+
+                sessions.Insert(0, session);
             }
 
-            chatMessage.AIResponse = aiResponse;
-            chatMessage.CreatedDate = DateTime.Now;
-
-            _context.ChatMessages.Add(chatMessage);
-
-            await _context.SaveChangesAsync();
+            var history = await _context.ChatMessages
+                .Where(x => x.ChatSessionId == sessionId)
+                .OrderBy(x => x.CreatedDate)
+                .ToListAsync();
 
             ChatViewModel model = new ChatViewModel
             {
-                UserMessage = chatMessage.UserMessage,
-                AIResponse = chatMessage.AIResponse
+                ChatHistory = history,
+                ChatSessionId = sessionId,
+                ChatSessions = sessions
             };
 
-            return View("Index", model);
+            return View(model);
         }
+
+
+
+
 
         public async Task<IActionResult> History(
             string? searchText,
@@ -131,5 +110,85 @@ namespace AIChatApp.Controllers
 
             return RedirectToAction("History");
         }
+
+        public async Task<IActionResult> NewChat()
+        {
+            var session = new ChatSession
+            {
+                Title = "New Chat",
+                CreatedDate = DateTime.Now
+            };
+
+            _context.ChatSessions.Add(session);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index", new { sessionId = session.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Insert(ChatMessage chatMessage)
+        {
+            if (string.IsNullOrWhiteSpace(chatMessage.UserMessage))
+            {
+                return RedirectToAction("Index", new
+                {
+                    sessionId = chatMessage.ChatSessionId
+                });
+            }
+
+            if (chatMessage.ChatSessionId == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            string aiResponse =
+                await _aiServices.GetResponseAsync(chatMessage.UserMessage);
+
+            if (aiResponse.StartsWith("Gemini API Error:") ||
+                aiResponse == "Gemini API key is not configured." ||
+                aiResponse == "No response received from Gemini.")
+            {
+                ChatViewModel errorModel = new ChatViewModel
+                {
+                    UserMessage = chatMessage.UserMessage,
+                    AIResponse = aiResponse,
+                    ChatSessionId = chatMessage.ChatSessionId
+                };
+
+                return View("Index", errorModel);
+            }
+
+            chatMessage.AIResponse = aiResponse;
+            chatMessage.CreatedDate = DateTime.Now;
+
+            var session = await _context.ChatSessions.FindAsync(chatMessage.ChatSessionId);
+
+            if(session !=null && session.Title == "New Chat")
+            {
+                session.Title = chatMessage.UserMessage;
+            }
+
+            _context.ChatMessages.Add(chatMessage);
+
+            await _context.SaveChangesAsync();
+
+            var history = await _context.ChatMessages
+                .Where(x => x.ChatSessionId == chatMessage.ChatSessionId)
+                .OrderBy(x => x.CreatedDate)
+                .ToListAsync();
+
+            ChatViewModel model = new ChatViewModel
+            {
+                UserMessage = chatMessage.UserMessage,
+                AIResponse = chatMessage.AIResponse,
+                ChatHistory = history,
+                ChatSessionId = chatMessage.ChatSessionId
+            };
+
+            return View("Index", model);
+        }
     }
-}
+
+    }
+

@@ -2,53 +2,143 @@
 
 <div class="container mt-4">
 
-    <h2>AI Chat</h2>
+    <div class="row">
 
-    <form method="post" action="/Chat/Insert">
+        <!-- Left Side - Chat Sessions -->
+        <div class="col-md-3">
 
-        <div class="mb-3">
-            <label class="form-label">Ask something</label>
+            <h4>Chats</h4>
 
-            <textarea name="UserMessage"
-                      class="form-control"
-                      rows="4"
-                      placeholder="Type your question..."></textarea>
+            <a asp-controller="Chat"
+               asp-action="NewChat"
+               class="btn btn-primary mb-3">
+                + New Chat
+            </a>
 
-            <span asp-validation-for="UserMessage"
-                  class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Send
-        </button>
-
-    </form>
-
-    @if (Model != null && !string.IsNullOrEmpty(Model.UserMessage))
-    {
-        <div class="mt-4">
-
-            <div class="card mb-3">
-                <div class="card-header">
-                    You
-                </div>
-
-                <div class="card-body">
-                    @Model.UserMessage
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    AI
-                </div>
-
-                <div class="card-body">
-                    @Model.AIResponse
-                </div>
-            </div>
+            @foreach (var session in Model.ChatSessions)
+            {
+                <a asp-controller="Chat"
+                   asp-action="Index"
+                   asp-route-sessionId="@session.Id"
+                   class="d-block mb-2 @(Model.ChatSessionId == session.Id ? "fw-bold bg-light p-2" : "")">
+                    @session.Title
+                </a>
+            }
 
         </div>
-    }
+
+
+        <!-- Right Side - Chat Area -->
+        <div class="col-md-9">
+
+            <h2>AI Chat</h2>
+
+            <a asp-controller="Chat"
+               asp-action="History"
+               class="btn btn-secondary mb-3">
+                Chat History
+            </a>
+
+
+            <!-- Message Form -->
+            <form method="post" action="/Chat/Insert">
+
+                <input type="hidden" asp-for="ChatSessionId" />
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Ask something
+                    </label>
+
+                    <textarea name="UserMessage"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Type your question..."></textarea>
+
+                    <span asp-validation-for="UserMessage"
+                          class="text-danger"></span>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Send
+                </button>
+
+            </form>
+
+
+            <!-- Current Response -->
+            @if (Model != null && !string.IsNullOrEmpty(Model.UserMessage))
+            {
+                <div class="mt-4">
+
+                    <div class="card mb-3">
+
+                        <div class="card-header">
+                            You
+                        </div>
+
+                        <div class="card-body">
+                            @Model.UserMessage
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            AI
+                        </div>
+
+                        <div class="card-body">
+                            @Model.AIResponse
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+
+            <!-- Previous Messages -->
+            @if (Model.ChatHistory != null && Model.ChatHistory.Any())
+            {
+                <hr />
+
+                <h4>Previous Conversations</h4>
+
+                @foreach (var chat in Model.ChatHistory)
+                {
+                    <div class="card mb-3">
+
+                        <div class="card-header">
+                            @chat.CreatedDate.ToString("dd-MM-yyyy HH:mm")
+                        </div>
+
+                        <div class="card-body">
+
+                            <strong>You:</strong>
+
+                            <p>
+                                @chat.UserMessage
+                            </p>
+
+                            <strong>AI:</strong>
+
+                            <p>
+                                @chat.AIResponse
+                            </p>
+
+                        </div>
+
+                    </div>
+                }
+            }
+
+        </div>
+
+    </div>
 
 </div>
