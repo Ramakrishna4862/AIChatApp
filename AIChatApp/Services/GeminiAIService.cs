@@ -12,14 +12,18 @@ namespace AIChatApp.Services
             _httpClient = httpClient;
         }
 
-        public async Task<string> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(string message)
         {
             string? apiKey =
                 Environment.GetEnvironmentVariable("GEMINI_API_KEY");
 
             if (string.IsNullOrEmpty(apiKey))
             {
-                return "Gemini API key is not configured.";
+                return new AIResponseResult
+                {
+                    Success = false,
+                    Error = "Gemini API key is not configured."
+                };
             }
 
             string url =
@@ -55,10 +59,18 @@ namespace AIChatApp.Services
                 {
                     if ((int)response.StatusCode == 429)
                     {
-                        return "Gemini request limit reached. Please try again later.";
+                        return new AIResponseResult
+                        {
+                            Success = false,
+                            Error = "Gemini request limit reached. Please try again later."
+                        };
                     }
 
-                    return "Gemini API Error: " + responseContent;
+                    return new AIResponseResult
+                    {
+                        Success = false,
+                        Error = "Gemini API Error: " + responseContent
+                    };
                 }
 
                 using JsonDocument document =
@@ -76,26 +88,49 @@ namespace AIChatApp.Services
                         {
                             if (content.GetProperty("type").GetString() == "text")
                             {
-                                return content.GetProperty("text").GetString()
-                                       ?? "No response received.";
+                                string responseText =
+                                    content.GetProperty("text").GetString()
+                                    ?? "No response received.";
+
+                                return new AIResponseResult
+                                {
+                                    Success = true,
+                                    Response = responseText
+                                };
                             }
                         }
                     }
                 }
 
-                return "No response received from Gemini.";
+                return new AIResponseResult
+                {
+                    Success = false,
+                    Error = "No response received from Gemini."
+                };
             }
             catch (TaskCanceledException)
             {
-                return "Gemini API request timed out. Please try again later.";
+                return new AIResponseResult
+                {
+                    Success = false,
+                    Error = "Gemini API request timed out. Please try again later."
+                };
             }
             catch (HttpRequestException)
             {
-                return "Unable to connect to Gemini API. Please check your internet connection and try again.";
+                return new AIResponseResult
+                {
+                    Success = false,
+                    Error = "Unable to connect to Gemini API. Please check your internet connection and try again."
+                };
             }
             catch (Exception)
             {
-                return "An unexpected error occurred while contacting Gemini.";
+                return new AIResponseResult
+                {
+                    Success = false,
+                    Error = "An unexpected error occurred while contacting Gemini."
+                };
             }
         }
     }

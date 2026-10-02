@@ -10,13 +10,31 @@ namespace AIChatApp.Controllers
     {
         private readonly IAIService _aiServices;
         private readonly ApplicationDbContext _context;
+        private readonly GroqAIService _groqAIService;
 
         public ChatController(
-            IAIService aiService,
-            ApplicationDbContext context)
+            IAIService aiServices,
+            ApplicationDbContext context,
+            GroqAIService groqAIService)
         {
-            _aiServices = aiService;
+            _aiServices = aiServices;
             _context = context;
+            _groqAIService = groqAIService;
+        }
+
+
+        public async Task<IActionResult> TestGroq()
+        {
+            AIResponseResult result =
+                await _groqAIService.GetResponseAsync(
+                    "Explain dependency injection in one sentence.");
+
+            if (result.Success)
+            {
+                return Content(result.Response);
+            }
+
+            return Content(result.Error);
         }
 
         public async Task<IActionResult> Index(int? sessionId)
@@ -27,18 +45,27 @@ namespace AIChatApp.Controllers
 
             if (sessionId == null)
             {
-                var session = new ChatSession
+                if (sessions.Any())
                 {
-                    Title = "New Chat",
-                    CreatedDate = DateTime.Now
-                };
+                    // Open the most recent existing chat
+                    sessionId = sessions.First().Id;
+                }
+                else
+                {
+                    // Create a chat only when no chats exist
+                    var session = new ChatSession
+                    {
+                        Title = "New Chat",
+                        CreatedDate = DateTime.Now
+                    };
 
-                _context.ChatSessions.Add(session);
-                await _context.SaveChangesAsync();
+                    _context.ChatSessions.Add(session);
+                    await _context.SaveChangesAsync();
 
-                sessionId = session.Id;
+                    sessionId = session.Id;
 
-                sessions.Insert(0, session);
+                    sessions.Insert(0, session);
+                }
             }
 
             var history = await _context.ChatMessages
@@ -55,7 +82,6 @@ namespace AIChatApp.Controllers
 
             return View(model);
         }
-
 
 
 
@@ -142,24 +168,22 @@ namespace AIChatApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            string aiResponse =
+            AIResponseResult aiResult =
                 await _aiServices.GetResponseAsync(chatMessage.UserMessage);
 
-            if (aiResponse.StartsWith("Gemini API Error:") ||
-                aiResponse == "Gemini API key is not configured." ||
-                aiResponse == "No response received from Gemini.")
+            if (!aiResult.Success)
             {
                 ChatViewModel errorModel = new ChatViewModel
                 {
                     UserMessage = chatMessage.UserMessage,
-                    AIResponse = aiResponse,
+                    AIResponse = aiResult.Error,
                     ChatSessionId = chatMessage.ChatSessionId
                 };
 
                 return View("Index", errorModel);
             }
 
-            chatMessage.AIResponse = aiResponse;
+            chatMessage.AIResponse = aiResult.Response;
             chatMessage.CreatedDate = DateTime.Now;
 
             var session = await _context.ChatSessions.FindAsync(chatMessage.ChatSessionId);
@@ -187,6 +211,23 @@ namespace AIChatApp.Controllers
             };
 
             return View("Index", model);
+        }
+
+        public async Task<IActionResult> DeleteSession(int id)
+        {
+            var session = await _context.ChatSessions.FindAsync(id);
+
+            if(session == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var messages = await _context.ChatMessages.Where(x => x.ChatSessionId == id).ToListAsync();
+
+            _context.ChatMessages.RemoveRange(messages);
+            _context.ChatSessions.Remove(session);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
     }
 

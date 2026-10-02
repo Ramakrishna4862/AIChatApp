@@ -17,12 +17,30 @@
 
             @foreach (var session in Model.ChatSessions)
             {
-                <a asp-controller="Chat"
-                   asp-action="Index"
-                   asp-route-sessionId="@session.Id"
-                   class="d-block mb-2 @(Model.ChatSessionId == session.Id ? "fw-bold bg-light p-2" : "")">
-                    @session.Title
-                </a>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+
+                    <a asp-controller="Chat"
+                       asp-action="Index"
+                       asp-route-sessionId="@session.Id"
+                       class="flex-grow-1 @(Model.ChatSessionId == session.Id ? "fw-bold bg-light p-2" : "")">
+                        @session.Title
+                    </a>
+
+                    <form asp-controller="Chat"
+                          asp-action="DeleteSession"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to delete this chat?');">
+
+                        <input type="hidden" name="id" value="@session.Id" />
+
+                        <button type="submit"
+                                class="btn btn-sm btn-danger ms-2">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
             }
 
         </div>
@@ -102,37 +120,44 @@
             }
 
 
-            <!-- Previous Messages -->
             @if (Model.ChatHistory != null && Model.ChatHistory.Any())
             {
                 <hr />
 
-                <h4>Previous Conversations</h4>
+                <h4>Conversation</h4>
 
                 @foreach (var chat in Model.ChatHistory)
                 {
-                    <div class="card mb-3">
+                    <!-- User Message -->
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="bg-primary text-white p-3 rounded"
+                             style="max-width: 75%;">
 
-                        <div class="card-header">
-                            @chat.CreatedDate.ToString("dd-MM-yyyy HH:mm")
-                        </div>
+                            <strong>You</strong>
 
-                        <div class="card-body">
-
-                            <strong>You:</strong>
-
-                            <p>
+                            <div class="mt-2">
                                 @chat.UserMessage
-                            </p>
-
-                            <strong>AI:</strong>
-
-                            <p>
-                                @chat.AIResponse
-                            </p>
+                            </div>
 
                         </div>
+                    </div>
 
+                    <!-- AI Response -->
+                    <div class="d-flex justify-content-start mb-3">
+                        <div class="bg-light border p-3 rounded"
+                             style="max-width: 75%;">
+
+                            <strong>AI</strong>
+
+                            <div class="mt-2">
+                                @chat.AIResponse
+                            </div>
+
+                            <small class="text-muted">
+                                @chat.CreatedDate.ToString("dd-MM-yyyy HH:mm")
+                            </small>
+
+                        </div>
                     </div>
                 }
             }

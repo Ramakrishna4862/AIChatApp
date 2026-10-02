@@ -2,6 +2,6 @@
 {
     public interface IAIService
     {
-        Task<string> GetResponseAsync(string message);
+        Task<AIResponseResult> GetResponseAsync(string message);
     }
 }

@@ -2,28 +2,34 @@
 {
     public class FakeAIService : IAIService
     {
-        public async Task<string> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(string message)
         {
             await Task.Delay(1000);
 
-            string userMessage = message.ToLower().Trim();
+            string response;
 
-            if (userMessage.Contains("what is c#"))
+            if (message.ToLower().Contains("what is c#"))
             {
-                return "C# is a programming language developed by Microsoft. It is commonly used to build web, desktop, mobile, and backend applications.";
+                response = "C# is a programming language developed by Microsoft.";
+            }
+            else if (message.ToLower().Contains("what is sql"))
+            {
+                response = "SQL is used to store, retrieve, and manage data in databases.";
+            }
+            else if (message.ToLower().Contains("what is asp.net core"))
+            {
+                response = "ASP.NET Core is a cross-platform framework used to build web applications and APIs.";
+            }
+            else
+            {
+                response = "This is a temporary local AI response.";
             }
 
-            if (userMessage.Contains("what is sql"))
+            return new AIResponseResult
             {
-                return "SQL is a language used to communicate with relational databases. It is commonly used to insert, update, delete, and retrieve data.";
-            }
-
-            if (userMessage.Contains("what is asp.net core"))
-            {
-                return "ASP.NET Core is a cross-platform framework from Microsoft used to build web applications, Web APIs, and backend services.";
-            }
-
-            return "I am a temporary local AI service. I don't have a real AI model connected right now, but I received your message: " + message;
+                Success = true,
+                Response = response
+            };
         }
     }
 }
