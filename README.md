@@ -108,21 +108,17 @@ Stores user messages and AI responses.
    * OPENROUTER_API_KEY
 6. Run the application.
 
-## Screenshots
+## Chat Interface
 
-Add screenshots here:
+![Chat Interface](screenshots/chat-interface.png)
 
-### Chat Interface
+## Chat Sessions
 
-[Insert Screenshot]
+![Chat Sessions](screenshots/chat-sessions.png)
 
-### Chat Sessions
+## Chat History
 
-[Insert Screenshot]
-
-### Chat History
-
-[Insert Screenshot]
+![Chat History](screenshots/chat-history.png)
 
 ## Learning Outcomes
 
