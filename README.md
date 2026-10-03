@@ -1,23 +1,25 @@
-# AIChatApp
+# AIChatApp 🤖
 
-AIChatApp is an AI-powered chatbot application built using ASP.NET Core MVC, SQL Server, and Entity Framework Core. The application supports multiple AI providers and automatically falls back to another provider if the current provider is unavailable or exceeds its quota.
+AIChatApp is an AI-powered chatbot application built using **ASP.NET Core MVC**, **SQL Server**, and **Entity Framework Core**. The application integrates multiple AI providers and automatically switches to an alternative provider when the primary provider is unavailable, rate-limited, or encounters an error.
 
-## Features
+## 🚀 Features
 
 * AI-powered chatbot interface
-* Chat session management
-* Create multiple chat conversations
-* Delete chat sessions
+* Multiple chat session management
+* Create and manage conversations
 * Store chat history in SQL Server
 * Search chat history
+* Delete individual messages
+* Delete entire chat sessions
 * Automatic AI provider fallback
-* Error handling and timeout handling
-* Dependency Injection implementation
+* Dependency Injection (DI) implementation
 * Environment variable-based API key management
+* Error and timeout handling
+* Responsive user interface using Bootstrap
 
-## AI Provider Fallback Flow
+## 🔄 AI Provider Fallback Flow
 
-The application automatically switches between AI providers when a provider is unavailable.
+The application automatically switches between AI providers to improve reliability.
 
 ```text
 User Question
@@ -33,7 +35,7 @@ OpenRouter AI
 Display Error Message
 ```
 
-## Technologies Used
+## 🛠️ Technologies Used
 
 ### Backend
 
@@ -48,45 +50,47 @@ Display Error Message
 * CSS
 * Bootstrap
 * JavaScript
+* Razor Views
 
-### AI Integration
+### AI Integrations
 
 * Google Gemini API
 * Groq API
 * OpenRouter API
 
-## Project Architecture
+## 🏗️ Architecture
 
 ### Services
 
-* IAIService
-* GeminiAIService
-* GroqAIService
-* OpenRouterAIService
-* FallbackAIService
+* `IAIService`
+* `GeminiAIService`
+* `GroqAIService`
+* `OpenRouterAIService`
+* `FallbackAIService`
 
 ### Database Entities
 
 #### ChatSession
 
-Stores conversation sessions.
+Stores conversation sessions and metadata.
 
 #### ChatMessage
 
-Stores user messages and AI responses.
+Stores user prompts, AI responses, timestamps, and session references.
 
-## Key Concepts Implemented
+## 📚 Concepts Implemented
 
 * Dependency Injection
-* Service-Based Architecture
-* Repository Pattern Concepts
+* Service-Oriented Architecture
 * Async/Await Programming
 * HTTP Client Integration
-* API Consumption
-* Error Handling
-* Fallback Strategy Design
+* External API Consumption
+* Entity Framework Core
+* SQL Server Database Operations
+* Error Handling and Exception Management
+* Multi-Provider AI Fallback Strategy
 
-## Installation
+## ⚙️ Installation & Setup
 
 ### Prerequisites
 
@@ -95,45 +99,63 @@ Stores user messages and AI responses.
 * SQL Server
 * SQL Server Management Studio (SSMS)
 
-### Setup
+### Setup Steps
 
-1. Clone the repository.
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+```
+
 2. Open the solution in Visual Studio.
-3. Update the SQL Server connection string.
-4. Run Entity Framework migrations.
+
+3. Configure the SQL Server connection string in `appsettings.json`.
+
+4. Apply Entity Framework migrations:
+
+```bash
+Update-Database
+```
+
 5. Configure environment variables:
 
-   * GEMINI_API_KEY
-   * GROQ_API_KEY
-   * OPENROUTER_API_KEY
+```text
+GEMINI_API_KEY
+GROQ_API_KEY
+OPENROUTER_API_KEY
+```
+
 6. Run the application.
 
-## Chat Interface
+## 📸 Screenshots
 
-![Chat Interface](screenshots/chat-interface.png)
+### Chat Interface
 
-## Chat Sessions
+![Chat Interface](screenshots/chat-interface.jpg)
 
-![Chat Sessions](screenshots/chat-sessions.png)
+### Chat Sessions
 
-## Chat History
+![Chat Sessions](screenshots/chat-sessions.jpg)
 
-![Chat History](screenshots/chat-history.png)
+### Chat History
 
-## Learning Outcomes
+![Chat History](screenshots/chat-history.jpg)
 
-This project helped me gain practical experience with:
+## 🎯 Learning Outcomes
 
-* ASP.NET Core MVC
+This project helped me gain hands-on experience with:
+
+* ASP.NET Core MVC Development
 * SQL Server and Entity Framework Core
 * Dependency Injection
-* External API Integration
-* Multi-provider AI Architecture
-* Error Handling and Fallback Mechanisms
+* API Integration
+* Multi-AI Provider Architecture
+* Fallback and Error Handling Mechanisms
+* Asynchronous Programming
+* Service-Based Application Design
 
-## Author
+## 👨‍💻 Author
 
-Rama Krishna R
+**Rama Krishna R**
 
-LinkedIn:
-linkedin.com/in/rama-krishna-a80133174
+LinkedIn: linkedin.com/in/rama-krishna-a80133174
