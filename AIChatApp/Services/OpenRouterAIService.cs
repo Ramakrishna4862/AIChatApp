@@ -32,7 +32,8 @@ namespace AIChatApp.Services
 
             var requestBody = new
             {
-                model = "openai/gpt-oss-20b:free",
+                //model = "openai/gpt-oss-20b:free",
+                model = "openrouter/free",
                 messages = new[]
                 {
                     new
@@ -99,7 +100,8 @@ namespace AIChatApp.Services
                 return new AIResponseResult
                 {
                     Success = true,
-                    Response = result
+                    Response = result,
+                    Provider = "OpenRouter"
                 };
             }
             catch (TaskCanceledException)

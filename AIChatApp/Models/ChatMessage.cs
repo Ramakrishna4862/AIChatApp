@@ -10,6 +10,7 @@
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public int? ChatSessionId { get; set; }
+        public string? Provider { get; set; }
         public ChatSession? ChatSession { get; set; }   
     }
 }

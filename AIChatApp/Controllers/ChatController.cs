@@ -10,32 +10,19 @@ namespace AIChatApp.Controllers
     {
         private readonly IAIService _aiServices;
         private readonly ApplicationDbContext _context;
-        private readonly GroqAIService _groqAIService;
 
         public ChatController(
             IAIService aiServices,
-            ApplicationDbContext context,
-            GroqAIService groqAIService)
+            ApplicationDbContext context)
         {
             _aiServices = aiServices;
             _context = context;
-            _groqAIService = groqAIService;
         }
 
 
-        public async Task<IActionResult> TestGroq()
-        {
-            AIResponseResult result =
-                await _groqAIService.GetResponseAsync(
-                    "Explain dependency injection in one sentence.");
+        
 
-            if (result.Success)
-            {
-                return Content(result.Response);
-            }
-
-            return Content(result.Error);
-        }
+        
 
         public async Task<IActionResult> Index(int? sessionId)
         {
@@ -184,6 +171,7 @@ namespace AIChatApp.Controllers
             }
 
             chatMessage.AIResponse = aiResult.Response;
+            chatMessage.Provider = aiResult.Provider;
             chatMessage.CreatedDate = DateTime.Now;
 
             var session = await _context.ChatSessions.FindAsync(chatMessage.ChatSessionId);

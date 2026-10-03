@@ -147,7 +147,13 @@
                         <div class="bg-light border p-3 rounded"
                              style="max-width: 75%;">
 
-                            <strong>AI</strong>
+                            <strong>
+                                AI
+                                @if (!string.IsNullOrEmpty(chat.Provider))
+                                {
+                                    <span>• @chat.Provider</span>
+                                }
+                            </strong>
 
                             <div class="mt-2">
                                 @chat.AIResponse

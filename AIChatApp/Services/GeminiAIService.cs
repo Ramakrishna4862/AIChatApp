@@ -26,8 +26,8 @@ namespace AIChatApp.Services
                 };
             }
 
-            string url =
-                "https://generativelanguage.googleapis.com/v1beta/interactions";
+            string url = "https://generativelanguage.googleapis.com/v1beta/interactions";
+            //string url = "https://generativelanguage.googleapis.com/v1beta/invalid";
 
             var requestBody = new
             {
@@ -95,7 +95,8 @@ namespace AIChatApp.Services
                                 return new AIResponseResult
                                 {
                                     Success = true,
-                                    Response = responseText
+                                    Response = responseText,
+                                    Provider = "Gemini"
                                 };
                             }
                         }

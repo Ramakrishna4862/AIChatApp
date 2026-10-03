@@ -27,8 +27,9 @@ namespace AIChatApp.Services
                 };
             }
 
-            string url =
-                "https://api.groq.com/openai/v1/chat/completions";
+            string url = "https://api.groq.com/openai/v1/chat/completions";
+
+            //string url = "https://api.groq.com/openai/v1/invalid";
 
             var requestBody = new
             {
@@ -95,7 +96,8 @@ namespace AIChatApp.Services
                 return new AIResponseResult
                 {
                     Success = true,
-                    Response = result
+                    Response = result,
+                    Provider = "Groq"
                 };
             }
             catch (TaskCanceledException)
