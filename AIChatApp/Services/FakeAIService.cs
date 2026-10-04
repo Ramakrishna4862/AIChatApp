@@ -1,8 +1,10 @@
-﻿namespace AIChatApp.Services
+﻿using AIChatApp.Models;
+
+namespace AIChatApp.Services
 {
     public class FakeAIService : IAIService
     {
-        public async Task<AIResponseResult> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(string message, List<ChatMessage> history)
         {
             await Task.Delay(1000);
 

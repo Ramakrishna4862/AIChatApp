@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using AIChatApp.Models;
 using System.Text;
 using System.Text.Json;
 
@@ -13,8 +14,17 @@ namespace AIChatApp.Services
             _httpClient = httpClient;
         }
 
-        public async Task<AIResponseResult> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(string message, List<ChatMessage> history)
         {
+            string conversationHistory = "";
+            foreach(var chat in history)
+            {
+                conversationHistory +=
+                        $"User: {chat.UserMessage}\n" +
+                        $"AI: {chat.AIResponse}\n";
+            }
+            conversationHistory += $"User: {message}";
+
             string? apiKey =
                 Environment.GetEnvironmentVariable("GROQ_API_KEY");
 
@@ -39,7 +49,7 @@ namespace AIChatApp.Services
                     new
                     {
                         role = "user",
-                        content = message
+                        content = conversationHistory
                     }
                 }
             };

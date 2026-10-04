@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using AIChatApp.Models;
 
 namespace AIChatApp.Services
 {
@@ -12,8 +13,19 @@ namespace AIChatApp.Services
             _httpClient = httpClient;
         }
 
-        public async Task<AIResponseResult> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(string message, List<ChatMessage> history)
         {
+            string conversationHistory = "";
+
+            foreach (var chat in history)
+            {
+                conversationHistory +=
+                    $"User: {chat.UserMessage}\n" +
+                    $"AI: {chat.AIResponse}\n";
+            }
+
+            conversationHistory += $"User: {message}";
+
             string? apiKey =
                 Environment.GetEnvironmentVariable("GEMINI_API_KEY");
 
@@ -29,11 +41,22 @@ namespace AIChatApp.Services
             string url = "https://generativelanguage.googleapis.com/v1beta/interactions";
             //string url = "https://generativelanguage.googleapis.com/v1beta/invalid";
 
+            Console.WriteLine("========== HISTORY ==========");
+            Console.WriteLine(conversationHistory);
+            Console.WriteLine("=============================");
+
             var requestBody = new
             {
                 model = "gemini-3.8-flash",
-                input = message
+                input = conversationHistory
             };
+
+            Console.WriteLine(JsonSerializer.Serialize(
+    requestBody,
+    new JsonSerializerOptions
+    {
+        WriteIndented = true
+    }));
 
             string json = JsonSerializer.Serialize(requestBody);
 

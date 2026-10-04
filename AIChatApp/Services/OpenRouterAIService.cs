@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using AIChatApp.Models;
 
 namespace AIChatApp.Services
 {
@@ -13,8 +14,20 @@ namespace AIChatApp.Services
             _httpClient = httpClient;
         }
 
-        public async Task<AIResponseResult> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(
+    string message,
+    List<ChatMessage> history)
         {
+            string conversationHistory = "";
+
+            foreach (var chat in history)
+            {
+                conversationHistory +=
+                    $"User: {chat.UserMessage}\n" +
+                    $"AI: {chat.AIResponse}\n";
+            }
+
+            conversationHistory += $"User: {message}";
             string? apiKey =
                 Environment.GetEnvironmentVariable("OPENROUTER_API_KEY");
 
@@ -39,7 +52,7 @@ namespace AIChatApp.Services
                     new
                     {
                         role = "user",
-                        content = message
+                        content = conversationHistory
                     }
                 }
             };

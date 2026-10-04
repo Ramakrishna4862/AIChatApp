@@ -1,4 +1,6 @@
-﻿namespace AIChatApp.Services
+﻿using AIChatApp.Models;
+
+namespace AIChatApp.Services
 {
     public class FallbackAIService : IAIService
     {
@@ -16,11 +18,11 @@
             _openRouterAIService = openRouterAIService;
         }
 
-        public async Task<AIResponseResult> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(string message, List<ChatMessage> history)
         {
             // 1. Try Gemini
             AIResponseResult geminiResult =
-                await _geminiAIService.GetResponseAsync(message);
+                await _geminiAIService.GetResponseAsync(message, history);
 
             if (geminiResult.Success)
             {
@@ -29,7 +31,7 @@
 
             // 2. Gemini failed → Try Groq
             AIResponseResult groqResult =
-                await _groqAIService.GetResponseAsync(message);
+                await _groqAIService.GetResponseAsync(message, history);
 
             if (groqResult.Success)
             {
@@ -38,7 +40,7 @@
 
             // 3. Gemini + Groq failed → Try OpenRouter
             AIResponseResult openRouterResult =
-                await _openRouterAIService.GetResponseAsync(message);
+                await _openRouterAIService.GetResponseAsync(message, history);
 
             if (openRouterResult.Success)
             {

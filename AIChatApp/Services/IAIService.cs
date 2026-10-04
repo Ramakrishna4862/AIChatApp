@@ -1,7 +1,9 @@
-﻿namespace AIChatApp.Services
+﻿using AIChatApp.Models;
+
+namespace AIChatApp.Services
 {
     public interface IAIService
     {
-        Task<AIResponseResult> GetResponseAsync(string message);
+        Task<AIResponseResult> GetResponseAsync(string message, List<ChatMessage> history);
     }
 }

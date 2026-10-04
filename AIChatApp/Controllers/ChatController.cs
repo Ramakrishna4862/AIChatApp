@@ -142,6 +142,10 @@ namespace AIChatApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Insert(ChatMessage chatMessage)
         {
+            var history = await _context.ChatMessages
+                           .Where(x => x.ChatSessionId == chatMessage.ChatSessionId)
+                           .OrderBy(x => x.CreatedDate)
+                           .ToListAsync();
             if (string.IsNullOrWhiteSpace(chatMessage.UserMessage))
             {
                 return RedirectToAction("Index", new
@@ -156,7 +160,7 @@ namespace AIChatApp.Controllers
             }
 
             AIResponseResult aiResult =
-                await _aiServices.GetResponseAsync(chatMessage.UserMessage);
+                await _aiServices.GetResponseAsync(chatMessage.UserMessage, history);
 
             if (!aiResult.Success)
             {
@@ -185,10 +189,6 @@ namespace AIChatApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            var history = await _context.ChatMessages
-                .Where(x => x.ChatSessionId == chatMessage.ChatSessionId)
-                .OrderBy(x => x.CreatedDate)
-                .ToListAsync();
 
             ChatViewModel model = new ChatViewModel
             {

@@ -1,6 +1,7 @@
 ﻿#pragma warning disable OPENAI001
 
 using OpenAI.Responses;
+using AIChatApp.Models;
 
 namespace AIChatApp.Services
 {
@@ -17,7 +18,7 @@ namespace AIChatApp.Services
             _client = new ResponsesClient(apiKey);
         }
 
-        public async Task<AIResponseResult> GetResponseAsync(string message)
+        public async Task<AIResponseResult> GetResponseAsync(string message, List<ChatMessage> history)
         {
             try
             {
