@@ -1,161 +1,177 @@
-# AIChatApp 🤖
+# AIChatApp
 
-AIChatApp is an AI-powered chatbot application built using **ASP.NET Core MVC**, **SQL Server**, and **Entity Framework Core**. The application integrates multiple AI providers and automatically switches to an alternative provider when the primary provider is unavailable, rate-limited, or encounters an error.
+An AI-powered chatbot web application built with **ASP.NET Core MVC, SQL Server, Entity Framework Core, and AI service integrations**.
 
 ## 🚀 Features
 
-* AI-powered chatbot interface
-* Multiple chat session management
-* Create and manage conversations
-* Store chat history in SQL Server
-* Search chat history
-* Delete individual messages
-* Delete entire chat sessions
-* Automatic AI provider fallback
-* Dependency Injection (DI) implementation
-* Environment variable-based API key management
-* Error and timeout handling
-* Responsive user interface using Bootstrap
-
-## 🔄 AI Provider Fallback Flow
-
-The application automatically switches between AI providers to improve reliability.
-
-```text
-User Question
-      ↓
-FallbackAIService
-      ↓
-Gemini AI
-      ↓ Failed
-Groq AI
-      ↓ Failed
-OpenRouter AI
-      ↓ Failed
-Display Error Message
-```
+* 💬 Chat with an AI assistant
+* 🤖 AI response generation through configurable AI services
+* 🔄 Fallback AI service support
+* 💾 Save chat conversations to SQL Server
+* 📜 View chat history
+* 🔍 Search conversations
+* 🗑️ Delete conversations
+* 📄 Pagination for chat history
+* 🔐 API keys stored using environment variables
+* 🎨 Responsive user interface using Bootstrap
 
 ## 🛠️ Technologies Used
 
-### Backend
+* **C#**
+* **ASP.NET Core MVC**
+* **Entity Framework Core**
+* **SQL Server**
+* **Razor Views**
+* **HTML5**
+* **CSS3**
+* **JavaScript**
+* **Bootstrap**
+* **REST APIs**
+* **Git & GitHub**
 
-* ASP.NET Core MVC
-* C#
-* Entity Framework Core
-* SQL Server
+## 🤖 AI Integration
 
-### Frontend
+The application is designed with an AI service abstraction using an `IAIService` interface.
 
-* HTML
-* CSS
-* Bootstrap
-* JavaScript
-* Razor Views
+Different AI services can be configured without changing the main chat functionality.
 
-### AI Integrations
+Current service implementations include:
 
-* Google Gemini API
-* Groq API
-* OpenRouter API
+* Fake AI Service
+* Gemini AI Service
+* Groq AI Service
+* OpenAI Service
+* OpenRouter AI Service
+* Fallback AI Service
 
-## 🏗️ Architecture
+API keys are read from environment variables and are **not stored directly in the source code**.
 
-### Services
+## 🗄️ Database
 
-* `IAIService`
-* `GeminiAIService`
-* `GroqAIService`
-* `OpenRouterAIService`
-* `FallbackAIService`
+The application uses **Microsoft SQL Server** with **Entity Framework Core**.
 
-### Database Entities
+Chat messages are stored with information such as:
 
-#### ChatSession
+* User message
+* AI response
+* Created date
+* Chat session
 
-Stores conversation sessions and metadata.
+Entity Framework Core migrations are used to create and update the database schema.
 
-#### ChatMessage
+## 📂 Project Structure
 
-Stores user prompts, AI responses, timestamps, and session references.
-
-## 📚 Concepts Implemented
-
-* Dependency Injection
-* Service-Oriented Architecture
-* Async/Await Programming
-* HTTP Client Integration
-* External API Consumption
-* Entity Framework Core
-* SQL Server Database Operations
-* Error Handling and Exception Management
-* Multi-Provider AI Fallback Strategy
-
-## ⚙️ Installation & Setup
-
-### Prerequisites
-
-* Visual Studio 2022
-* .NET SDK
-* SQL Server
-* SQL Server Management Studio (SSMS)
-
-### Setup Steps
-
-1. Clone the repository:
-
-```bash
-git clone <repository-url>
+```text
+AIChatApp
+│
+├── Controllers
+│   └── ChatController.cs
+│
+├── Models
+│   ├── ChatMessage.cs
+│   ├── ChatSession.cs
+│   └── ChatViewModel.cs
+│
+├── Services
+│   ├── IAIService.cs
+│   ├── FakeAIService.cs
+│   ├── GeminiAIService.cs
+│   ├── GroqAIService.cs
+│   ├── OpenAIService.cs
+│   ├── OpenRouterAIService.cs
+│   └── FallbackAIService.cs
+│
+├── Views
+│   └── Chat
+│       ├── Index.cshtml
+│       └── History.cshtml
+│
+└── Data
+    └── ApplicationDbContext.cs
 ```
 
-2. Open the solution in Visual Studio.
+## ⚙️ How to Run
 
-3. Configure the SQL Server connection string in `appsettings.json`.
-
-4. Apply Entity Framework migrations:
+### 1. Clone the repository
 
 ```bash
-Update-Database
+git clone https://github.com/Ramakrishna4862/AIChatApp.git
 ```
 
-5. Configure environment variables:
+### 2. Open the project
+
+Open the solution in **Visual Studio 2022**.
+
+### 3. Configure SQL Server
+
+Update the connection string in `appsettings.json` according to your SQL Server instance.
+
+Example:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=YOUR_SERVER;Database=AIChatAppDb;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+```
+
+### 4. Configure the AI API key
+
+Set the required API key as an environment variable.
+
+For example:
 
 ```text
 GEMINI_API_KEY
-GROQ_API_KEY
-OPENROUTER_API_KEY
 ```
 
-6. Run the application.
+or
 
-## 📸 Screenshots
+```text
+GROQ_API_KEY
+```
 
-### Chat Interface
+Do not add real API keys to `appsettings.json` or commit them to GitHub.
 
-![Chat Interface](screenshots/chat-interface.jpg)
+### 5. Apply database migrations
 
-### Chat Sessions
+Run:
 
-![Chat Sessions](screenshots/chat-sessions.jpg)
+```powershell
+Update-Database
+```
 
-### Chat History
+from the Visual Studio Package Manager Console.
 
-![Chat History](screenshots/chat-history.jpg)
+### 6. Run the application
 
-## 🎯 Learning Outcomes
+Press:
 
-This project helped me gain hands-on experience with:
+```text
+Ctrl + F5
+```
 
-* ASP.NET Core MVC Development
-* SQL Server and Entity Framework Core
-* Dependency Injection
-* API Integration
-* Multi-AI Provider Architecture
-* Fallback and Error Handling Mechanisms
-* Asynchronous Programming
-* Service-Based Application Design
+or run the project from Visual Studio.
+
+## 🔐 Security
+
+API keys are accessed through environment variables rather than being hard-coded into the application.
+
+**Never commit real API keys to GitHub.**
+
+## 📌 Future Improvements
+
+* User authentication and authorization
+* Multiple independent chat sessions
+* Improved AI conversation context
+* Streaming AI responses
+* File upload support
+* More advanced chat search and filtering
+* Deployment to a cloud platform
 
 ## 👨‍💻 Author
 
-**Rama Krishna R**
+**Rama Krishna**
 
-LinkedIn: linkedin.com/in/rama-krishna-a80133174
+.NET Developer | ASP.NET Core | C# | SQL Server
+
+GitHub: https://github.com/Ramakrishna4862
